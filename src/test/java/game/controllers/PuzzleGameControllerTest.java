@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+
 @WebMvcTest(PuzzleGameController.class)
 class PuzzleGameControllerTest {
 
@@ -24,44 +26,64 @@ class PuzzleGameControllerTest {
     private PuzzleGameService puzzleGameService;
 
     private Integer playerId;
-    private Integer[][] startingGameTiles;
-    private String startingBoardString;
 
     @BeforeEach
     public void  setUp(){
         playerId = 1;
-        startingGameTiles = new Integer[][] {
-                {1, 2, 3, 4},
-                {5, 6, 7, 8},
-                {9, 10, 11, 12},
-                {13, 14, 15, 0}
-        };
-        String startingBoardString =
-                "&nbsp;**************** <br>" +
-                        "&nbsp;*&nbsp;&nbsp;1&nbsp;*&nbsp;&nbsp;2&nbsp;*&nbsp;&nbsp;3&nbsp;*&nbsp;&nbsp;4&nbsp;*<br>"+
-                        "&nbsp;**************** <br>&nbsp;*&nbsp;&nbsp;5&nbsp;*&nbsp;&nbsp;6&nbsp;*&nbsp;&nbsp;7&nbsp;*&nbsp;&nbsp;8&nbsp;*<br>"+
-                        "&nbsp;**************** <br>&nbsp;*&nbsp;&nbsp;9&nbsp;*&nbsp;10&nbsp;*&nbsp;11&nbsp;*&nbsp;12&nbsp;*<br>"+
-                        "&nbsp;**************** <br>&nbsp;*&nbsp;13&nbsp;*&nbsp;14&nbsp;*&nbsp;15&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>"+
-                        "&nbsp;**************** <br>";
 
     }
 
     @Test
-    void startGame() throws Exception {
-        Mockito.when(puzzleGameService.startNewGame(playerId)).thenReturn(startingBoardString);
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/game/puzzle15/{id}/new",playerId))
+    void test_endpoint_startGame() throws Exception {
+        String expectedResponse = "Player 1 Game Board";
+        Mockito.when(puzzleGameService.startNewGame(playerId)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/game/puzzle15/{id}/new",playerId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String responseBody = result.getResponse().getContentAsString();
-        Assertions.assertEquals(startingBoardString, responseBody);
-        Mockito.verify(puzzleGameService).startNewGame(playerId);
+                .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+        verify(puzzleGameService).startNewGame(playerId);
     }
 
     @Test
-    void playGame() {
+    void test_endpoint_getGame() throws Exception {
+        String expectedResponse = "Player 1 Game Board";
+        puzzleGameService.addGame(playerId, expectedResponse);
+        Mockito.when(puzzleGameService.getGame(playerId)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/game/puzzle15/{id}",playerId))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+        verify(puzzleGameService).getGame(playerId);
     }
 
     @Test
-    void deletedGame() {
+    void test_endpoint_playGame() throws Exception {
+        String moveTile = "left";
+        String expectedResponse = "Player 1 Game Board Moved Tile left";
+        Mockito.when(puzzleGameService.playGame(playerId, moveTile)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/game/puzzle15/{playerID}?moveTile={moveTile}", playerId, moveTile))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+        verify(puzzleGameService).playGame(playerId, moveTile);
+    }
+
+    @Test
+    void test_endpoint_playGame_win() throws Exception {
+        String moveTile = "won";
+        String expectedResponse = "Congratulation You WON";
+        Mockito.when(puzzleGameService.playGame(playerId, moveTile)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/game/puzzle15/{playerID}?moveTile={moveTile}", playerId, moveTile))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+        verify(puzzleGameService).playGame(playerId, moveTile);
+    }
+
+    @Test
+    void test_endpoint_deletedGame() throws Exception {
+        String expectedResponse = "Game deleted";
+        puzzleGameService.addGame(playerId, "Player 1 Game Board");
+        Mockito.when(puzzleGameService.deleteGame(playerId)).thenReturn(expectedResponse);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/game/puzzle15/{id}",playerId))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
+        verify(puzzleGameService).deleteGame(playerId);
     }
 }

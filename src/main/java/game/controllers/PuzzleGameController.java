@@ -13,19 +13,22 @@ public class PuzzleGameController {
     PuzzleGameService gameService;
 
     @GetMapping("/{playerId}/new")
-    public ResponseEntity<String> startGame(@PathVariable Integer playerId){
-        String newGame = gameService.startNewGame(playerId);
-        return ResponseEntity.ok().body(newGame);
+    public String startGame(@PathVariable Integer playerId){
+        return gameService.startNewGame(playerId);
     }
 
-    @GetMapping("/{playerID}/{moveTile}")
-    public ResponseEntity<String> playGame(@PathVariable Integer playerID, @PathVariable String moveTile){
-        String gameUpdated = gameService.playGame(playerID, moveTile);
-        return ResponseEntity.ok().body(gameUpdated);
+    @GetMapping("/{playerId}")
+    public String getGame(@PathVariable Integer playerId){
+        return gameService.getGame(playerId);
     }
+
+    @PostMapping("/{playerID}")
+    public String playGame(@PathVariable Integer playerID, @RequestParam String moveTile){
+        return gameService.playGame(playerID, moveTile);
+    }
+
     @DeleteMapping("/{playerId}")
-    public ResponseEntity<String> deletedGame(@PathVariable Integer playerId){
-        String lastGame = gameService.deleteGame(playerId);
-        return ResponseEntity.ok().body(lastGame);
+    public String deletedGame(@PathVariable Integer playerId){
+        return gameService.deleteGame(playerId);
     }
 }
