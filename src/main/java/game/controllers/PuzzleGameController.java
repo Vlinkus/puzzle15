@@ -19,7 +19,7 @@ public class PuzzleGameController {
     }
 
     @GetMapping("/{playerId}")
-    public ResponseEntity<String> getGame(@PathVariable Integer playerId){
+    public ResponseEntity<String> getGameString(@PathVariable Integer playerId){
         String currentGame = gameService.getGameString(playerId);
         return ResponseEntity.ok().body(currentGame);
     }

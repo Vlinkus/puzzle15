@@ -94,10 +94,8 @@ class PuzzleGameServiceTest {
                         "&nbsp;**************** <br>";
 
         puzzleGameService.addGame(playerId, gameTiles);
-        when(gameBoard.updateBoard(startingGameTiles, emptyTilePosition,switchingTilePosition)).thenReturn(updatedGameTiles);
+        when(gameBoard.updateBoard(gameTiles, emptyTilePosition,switchingTilePosition)).thenReturn(updatedGameTiles);
         when(gameBoard.getBoardString(updatedGameTiles)).thenReturn(expectedBoardString);
-        Integer[][] updatedTiles = puzzleGameService.getGame(playerId);
-        assertTrue(Arrays.deepEquals(updatedTiles, updatedGameTiles));
         String actualString  = puzzleGameService.playGame(playerId, "up");
         Assertions.assertEquals(expectedBoardString, actualString);
     }
@@ -111,9 +109,9 @@ class PuzzleGameServiceTest {
         String expectedString = "Congratulation You WON";
 
         puzzleGameService.addGame(playerId, gameTiles);
-        when(gameBoard.updateBoard(startingGameTiles, emptyTilePosition,switchingTilePosition)).thenReturn(updatedGameTiles);
-
+        when(gameBoard.updateBoard(gameTiles, emptyTilePosition,switchingTilePosition)).thenReturn(updatedGameTiles);
         String actualString  = puzzleGameService.playGame(playerId, "right");
+        verify(gameBoard).updateBoard(gameTiles, emptyTilePosition,switchingTilePosition);
         Assertions.assertEquals(expectedString, actualString);
     }
 

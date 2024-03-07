@@ -29,8 +29,7 @@ public class PuzzleGameService implements PuzzleGame {
 
     public String playGame(Integer playerId, String directionToMoveTile) {
             Integer[][] updatedGameTile = moveTile(playerId, directionToMoveTile);
-        boolean isPuzzleSolved = checkIfPuzzleSolved(updatedGameTile);
-            return isPuzzleSolved ?
+            return checkIfPuzzleSolved(updatedGameTile) ?
                     "Congratulation You WON" :
                     gameBoard.getBoardString(games.get(playerId));
     }
@@ -102,7 +101,7 @@ public class PuzzleGameService implements PuzzleGame {
         return Arrays.deepEquals(gameTiles, solvedPuzzle);
     }
 
-    public Integer[][] getGame(Integer playerId) {
+    protected Integer[][] getGame(Integer playerId) {
         return games.get(playerId);
     }
 
